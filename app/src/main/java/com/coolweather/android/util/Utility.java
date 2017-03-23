@@ -5,6 +5,8 @@ import android.text.TextUtils;
 import com.coolweather.android.db.City;
 import com.coolweather.android.db.County;
 import com.coolweather.android.db.Province;
+import com.coolweather.android.gson.WeatherBean;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,7 +26,7 @@ public class Utility {
         if (!TextUtils.isEmpty(response)) {
             try {
                 JSONArray jsonArray = new JSONArray(response);
-                for (int i = 0; i < jsonArray.hashCode(); i++) {
+                for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     Province province = new Province();
                     province.setProvinceName(jsonObject.getString("name"));
@@ -46,7 +48,7 @@ public class Utility {
         if (!TextUtils.isEmpty(response)) {
             try {
                 JSONArray jsonArray = new JSONArray(response);
-                for (int i = 0; i < jsonArray.hashCode(); i++) {
+                for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     City city = new City();
                     city.setCityName(jsonObject.getString("name"));
@@ -69,7 +71,7 @@ public class Utility {
         if (!TextUtils.isEmpty(response)) {
             try {
                 JSONArray jsonArray = new JSONArray(response);
-                for (int i = 0; i < jsonArray.hashCode(); i++) {
+                for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     County county = new County();
                     county.setCountyName(jsonObject.getString("name"));
@@ -83,5 +85,20 @@ public class Utility {
             }
         }
         return false;
+    }
+
+    /**
+     * 将返回的JSON数据解析Weather实体类
+     */
+    public static WeatherBean handleWeatherResponse(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather");
+            String weatherContent = jsonArray.getJSONObject(0).toString();
+            return new Gson().fromJson(weatherContent, WeatherBean.class);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
