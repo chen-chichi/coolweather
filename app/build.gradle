@@ -11,10 +11,38 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    signingConfigs {
+        config_release {
+            keyAlias 'chenhe'
+            keyPassword 'chenhe961103'
+            storeFile file('chenhe.jks')
+            storePassword 'chenhe'
+        }
+
+        debug {
+            keyAlias 'chenhe'
+            keyPassword 'chenhe961103'
+            storeFile file('chenhe.jks')
+            storePassword 'chenhe'
+        }
+    }
+
+
     buildTypes {
         release {
             minifyEnabled false
+            signingConfig signingConfigs.config_release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
+            // 移除无用的resource文件
+            shrinkResources false
+            debuggable false
+        }
+        debug {
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            minifyEnabled false
+            signingConfig signingConfigs.debug
+            proguardFiles 'proguard-rules.pro'
         }
     }
 }

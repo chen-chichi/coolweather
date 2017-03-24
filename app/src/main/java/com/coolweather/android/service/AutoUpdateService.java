@@ -20,9 +20,6 @@ import okhttp3.Callback;
 import okhttp3.Response;
 
 public class AutoUpdateService extends Service {
-    public AutoUpdateService() {
-
-    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -58,7 +55,7 @@ public class AutoUpdateService extends Service {
             public void onResponse(Call call, Response response) throws IOException {
                 String bingpic = response.body().string();
                 SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(AutoUpdateService.this).edit();
-                edit.putString("bing_pic", null);
+                edit.putString("bing_pic", bingpic);
                 edit.apply();
             }
         });
@@ -87,7 +84,7 @@ public class AutoUpdateService extends Service {
                     WeatherBean weather = Utility.handleWeatherResponse(responseText);
                     if (weather != null && "ok".equals(weather.getStatus())) {
                         SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(AutoUpdateService.this).edit();
-                        edit.putString("weather", null);
+                        edit.putString("weather", responseText);
                         edit.apply();
                     }
                 }

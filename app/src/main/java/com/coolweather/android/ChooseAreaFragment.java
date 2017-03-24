@@ -251,7 +251,7 @@ public class ChooseAreaFragment extends Fragment {
     private void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(getContext());
-            mProgressDialog.setMessage("亲爱的别急，正在加载呢...");
+            mProgressDialog.setMessage("正在加载中...");
             mProgressDialog.setCanceledOnTouchOutside(false);
         }
         mProgressDialog.show();

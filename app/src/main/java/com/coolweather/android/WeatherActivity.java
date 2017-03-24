@@ -21,6 +21,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.coolweather.android.gson.WeatherBean;
@@ -116,7 +117,7 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
+                Toast.makeText(WeatherActivity.this, "等待后续添加...", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -200,7 +201,7 @@ public class WeatherActivity extends AppCompatActivity {
      * 展示SnackBar的提示信息
      */
     public void showSnackBar() {
-        Snackbar snackbar = Snackbar.make(mSvWeather, "小傻瓜，现在是没网的二次元", Snackbar.LENGTH_SHORT);
+        Snackbar snackbar = Snackbar.make(mSvWeather, "你目前处于没网的二次元世界", Snackbar.LENGTH_SHORT);
         View snackbarView = snackbar.getView();
         snackbarView.setBackgroundColor(getResources().getColor(R.color.colortouming));
         TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
