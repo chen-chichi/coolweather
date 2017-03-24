@@ -24,6 +24,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.coolweather.android.gson.WeatherBean;
+import com.coolweather.android.service.AutoUpdateService;
 import com.coolweather.android.util.HttpUtil;
 import com.coolweather.android.util.Utility;
 
@@ -264,6 +265,12 @@ public class WeatherActivity extends AppCompatActivity {
         mTvSport.setText(sport);
         mTvUv.setText(uv);
         mSvWeather.setVisibility(View.VISIBLE);
+
+        /**
+         *  启动后台更新天气的服务
+         */
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
 
     }
 
