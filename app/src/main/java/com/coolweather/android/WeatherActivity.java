@@ -1,18 +1,26 @@
 package com.coolweather.android;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatTextView;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.coolweather.android.gson.WeatherBean;
@@ -35,10 +43,17 @@ public class WeatherActivity extends AppCompatActivity {
     private AppCompatTextView mTvAqi;
     private AppCompatTextView mTvPm25;
     private AppCompatTextView mTvComfort;
-    private AppCompatTextView mTvCarwash;
+    private AppCompatTextView mTvflu;
     private AppCompatTextView mTvSport;
     private ScrollView mSvWeather;
     private AppCompatImageView mImgBingpic;
+    public SwipeRefreshLayout mSwipeRefresh;
+    private AppCompatImageView mIvHome;
+    public DrawerLayout mDrawLayout;
+    private String mBing_pic;
+    private AppCompatTextView mTvUv;
+    private FloatingActionButton mFab;
+    private SharedPreferences mPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,28 +64,62 @@ public class WeatherActivity extends AppCompatActivity {
             decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
-
         setContentView(R.layout.activity_weather);
         initView();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String weather = preferences.getString("weather", null);
-        String bing_pic = preferences.getString("bing_pic", null);
-        if (bing_pic != null) {
-            Glide.with(this).load(bing_pic).into(mImgBingpic);
+        //设置下拉刷新的颜色
+        mSwipeRefresh.setColorSchemeColors(getResources().getColor(R.color.colorAccent));
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String weatherString = mPreferences.getString("weather", null);
+        final String weatherId;
+        mBing_pic = mPreferences.getString("bing_pic", null);
+        if (mBing_pic != null) {
+            Glide.with(this).load(mBing_pic).into(mImgBingpic);
         } else {
             loadBingPic();
         }
-        if (weather != null) {
+        if (weatherString != null) {
             //有缓存时直接解析数据
-            WeatherBean weatherBean = Utility.handleWeatherResponse(weather);
+            WeatherBean weatherBean = Utility.handleWeatherResponse(weatherString);
             showWeatherInfo(weatherBean);
         } else {
             //无缓存时去服务器查询
-            String weather_id = getIntent().getStringExtra("weather_id");
+            weatherId = getIntent().getStringExtra("weather_id");
             mSvWeather.setVisibility(View.GONE);
-            requestWeather(weather_id);
+            requestWeather(weatherId);
         }
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                mSwipeRefresh.setRefreshing(true);
+                String weatherString = mPreferences.getString("weather", null);
+                WeatherBean weatherBean = Utility.handleWeatherResponse(weatherString);
+                String id = weatherBean.getBasic().getId();
+                requestWeather(id);
+            }
+        });
+
+        /**
+         * 设置抽屉布局的监听
+         */
+        mIvHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawLayout.openDrawer(GravityCompat.START);
+            }
+        });
+
+        /**
+         * 设置FloatActionButton的监听
+         */
+        mFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+            }
+        });
     }
+
 
     /**
      * 加载必应每日一图
@@ -105,7 +154,7 @@ public class WeatherActivity extends AppCompatActivity {
      *
      * @param weatherId
      */
-    private void requestWeather(String weatherId) {
+    public void requestWeather(String weatherId) {
         String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=18a4d147e1c64cab8fdbc03f1bc5c69e";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
@@ -121,8 +170,11 @@ public class WeatherActivity extends AppCompatActivity {
                             edit.apply();
                             showWeatherInfo(weatherBean);
                         } else {
-                            Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                            showSnackBar();
+
+
                         }
+                        mSwipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -132,7 +184,8 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        showSnackBar();
+                        mSwipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -140,6 +193,35 @@ public class WeatherActivity extends AppCompatActivity {
 
         });
         loadBingPic();
+    }
+
+    /**
+     * 展示SnackBar的提示信息
+     */
+    public void showSnackBar() {
+        Snackbar snackbar = Snackbar.make(mSvWeather, "小傻瓜，现在是没网的二次元", Snackbar.LENGTH_SHORT);
+        View snackbarView = snackbar.getView();
+        snackbarView.setBackgroundColor(getResources().getColor(R.color.colortouming));
+        TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setGravity(Gravity.CENTER);
+        textView.setTextColor(getResources().getColor(R.color.colorsnackbar));
+        snackbar.setActionTextColor(getResources().getColor(R.color.colorsnackbar));
+        snackbar.setAction("查看网络", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 跳转到系统的网络设置界面
+                Intent intent = null;
+                // 先判断当前系统版本
+                if (Build.VERSION.SDK_INT > 10) {  // 3.0以上
+                    intent = new Intent(Settings.ACTION_WIRELESS_SETTINGS);
+                } else {
+                    intent = new Intent();
+                    intent.setClassName("com.android.settings", "com.android.settings.WirelessSettings");
+                }
+                startActivity(intent);
+            }
+        });
+        snackbar.show();
     }
 
     /**
@@ -165,8 +247,8 @@ public class WeatherActivity extends AppCompatActivity {
             AppCompatTextView mTvMin = (AppCompatTextView) view.findViewById(R.id.tv_min);
             mTvDate.setText(forecastBean.getDate());
             mTvInfo.setText(forecastBean.getCond().getTxt_d());
-            mTvMax.setText(forecastBean.getTmp().getMax());
-            mTvMin.setText(forecastBean.getTmp().getMin());
+            mTvMax.setText(forecastBean.getTmp().getMax() + "℃");
+            mTvMin.setText(forecastBean.getTmp().getMin() + "℃");
             mLlForecast.addView(view);
         }
         if (weather.getAqi() != null) {
@@ -174,11 +256,13 @@ public class WeatherActivity extends AppCompatActivity {
             mTvPm25.setText(weather.getAqi().getCity().getPm25());
         }
         String comfort = "舒适度：" + weather.getSuggestion().getComf().getTxt();
-        String carWash = "汽车指数：" + weather.getSuggestion().getCw().getTxt();
+        String flu = "感冒指数：" + weather.getSuggestion().getFlu().getTxt();
         String sport = "运动建议：" + weather.getSuggestion().getSport().getTxt();
+        String uv = "紫外线指数：" + weather.getSuggestion().getUv().getTxt();
         mTvComfort.setText(comfort);
-        mTvCarwash.setText(carWash);
+        mTvflu.setText(flu);
         mTvSport.setText(sport);
+        mTvUv.setText(uv);
         mSvWeather.setVisibility(View.VISIBLE);
 
     }
@@ -195,9 +279,14 @@ public class WeatherActivity extends AppCompatActivity {
         mTvAqi = (AppCompatTextView) findViewById(R.id.tv_aqi);
         mTvPm25 = (AppCompatTextView) findViewById(R.id.tv_pm25);
         mTvComfort = (AppCompatTextView) findViewById(R.id.tv_comfort);
-        mTvCarwash = (AppCompatTextView) findViewById(R.id.tv_carwash);
+        mTvflu = (AppCompatTextView) findViewById(R.id.tv_flu);
         mTvSport = (AppCompatTextView) findViewById(R.id.tv_sport);
         mSvWeather = (ScrollView) findViewById(R.id.sv_weather);
         mImgBingpic = (AppCompatImageView) findViewById(R.id.img_bingpic);
+        mSwipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        mIvHome = (AppCompatImageView) findViewById(R.id.iv_home);
+        mDrawLayout = (DrawerLayout) findViewById(R.id.draw_layout);
+        mTvUv = (AppCompatTextView) findViewById(R.id.tv_uv);
+        mFab = (FloatingActionButton) findViewById(R.id.fab);
     }
 }

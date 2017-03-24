@@ -8,7 +8,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary">
+        android:background="#C7C3C0">
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/tv_title"
@@ -16,7 +16,7 @@
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:textColor="#fff"
-            android:textSize="20sp"/>
+            android:textSize="25sp"/>
 
         <android.support.v7.widget.AppCompatImageView
             android:id="@+id/iv_back"
@@ -29,6 +29,7 @@
     </RelativeLayout>
 
     <ListView
+        android:background="@drawable/a"
         android:id="@+id/list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

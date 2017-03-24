@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimary"
+    android:background="@drawable/timg"
     tools:context="com.coolweather.android.WeatherActivity">
 
     <android.support.v7.widget.AppCompatImageView
@@ -13,28 +14,67 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"/>
 
-    <ScrollView
-        android:id="@+id/sv_weather"
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/draw_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:overScrollMode="never"
-        android:scrollbars="none">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <android.support.design.widget.CoordinatorLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fitsSystemWindows="true"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <include layout="@layout/title"/>
+            <android.support.v4.widget.SwipeRefreshLayout
+                android:id="@+id/swipe_refresh"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <include layout="@layout/now"/>
+                <ScrollView
+                    android:id="@+id/sv_weather"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:overScrollMode="never"
+                    android:scrollbars="none">
 
-            <include layout="@layout/forecast"/>
 
-            <include layout="@layout/aqi"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fitsSystemWindows="true"
+                        android:orientation="vertical">
 
-            <include layout="@layout/suggestion"/>
-        </LinearLayout>
-    </ScrollView>
+                        <include layout="@layout/title"/>
+
+                        <include layout="@layout/now"/>
+
+                        <include layout="@layout/forecast"/>
+
+                        <include layout="@layout/aqi"/>
+
+                        <include layout="@layout/suggestion"/>
+                    </LinearLayout>
+
+
+                </ScrollView>
+
+            </android.support.v4.widget.SwipeRefreshLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="12dp"
+                android:src="@drawable/ic_delete_black_24dp"
+                app:backgroundTint="#03A9F4"
+                android:alpha="0.8"
+                app:elevation="8dp"/>
+        </android.support.design.widget.CoordinatorLayout>
+
+        <fragment
+            android:id="@+id/nav_choose_area"
+            android:name="com.coolweather.android.ChooseAreaFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"/>
+    </android.support.v4.widget.DrawerLayout>
 </FrameLayout>

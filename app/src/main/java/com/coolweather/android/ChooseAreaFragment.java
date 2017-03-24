@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.coolweather.android.db.City;
 import com.coolweather.android.db.County;
@@ -62,6 +61,7 @@ public class ChooseAreaFragment extends Fragment {
     private City selectedCity;
     //当前选中的级别
     private int currentLevel;
+    private WeatherActivity mActivity;
 
     @Nullable
     @Override
@@ -77,6 +77,8 @@ public class ChooseAreaFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (currentLevel == LEVEL_PROVINCE) {
@@ -87,10 +89,18 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounties();
                 } else if (currentLevel == LEVEL_COUNTY) {
                     String weatherId = mCountyList.get(position).getWeatherId();
-                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                    intent.putExtra("weather_id", weatherId);
-                    startActivity(intent);
-                    getActivity().finish();
+                    if (getActivity() instanceof MainActivity) {
+                        Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                        intent.putExtra("weather_id", weatherId);
+                        startActivity(intent);
+                        getActivity().finish();
+                    } else if (getActivity() instanceof WeatherActivity) {
+                        mActivity = (WeatherActivity) getActivity();
+                        mActivity.mDrawLayout.closeDrawers();
+                        mActivity.mSwipeRefresh.setRefreshing(true);
+                        mActivity.requestWeather(weatherId);
+                    }
+
                 }
             }
         });
@@ -217,7 +227,7 @@ public class ChooseAreaFragment extends Fragment {
                     @Override
                     public void run() {
                         closeProgressDialog();
-                        Toast.makeText(getContext(), "加载数据失败", Toast.LENGTH_SHORT).show();
+                        mActivity.showSnackBar();
                     }
                 });
             }
@@ -241,7 +251,7 @@ public class ChooseAreaFragment extends Fragment {
     private void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(getContext());
-            mProgressDialog.setMessage("正在加载...");
+            mProgressDialog.setMessage("亲爱的别急，正在加载呢...");
             mProgressDialog.setCanceledOnTouchOutside(false);
         }
         mProgressDialog.show();

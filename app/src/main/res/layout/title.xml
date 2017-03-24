@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize">
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/iv_home"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/ic_favorite_black_24dp"/>
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/title_city"
@@ -9,7 +19,8 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:textColor="#fff"
-        android:textSize="20sp"/>
+        android:textSize="25sp"/>
+
 
     <android.support.v7.widget.AppCompatTextView
         android:id="@+id/tv_updatetime"
@@ -17,7 +28,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:layout_marginRight="10dp"
+        android:layout_marginRight="6dp"
+        android:textColor="#fff"
+        android:textSize="16sp"/>
+
+    <android.support.v7.widget.AppCompatTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/tv_updatetime"
+        android:text="更新于:"
         android:textColor="#fff"
         android:textSize="16sp"/>
 </RelativeLayout>
